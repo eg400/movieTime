@@ -3,12 +3,14 @@ package com.example.egibson.movietime;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,9 +115,9 @@ public class MainActivityFragment extends Fragment {
                 final String base;
                 Log.e("PlaceholderFragment", "params[0]="+params[0]);
                 if (params[0].equals("0"))
-                    base = "http://api.themoviedb.org/3/movie/popular?api_key=0a4e07e521aa70416fb2f0bd1985a5ac";
+                    base = "http://api.themoviedb.org/3/movie/popular?api_key="+BuildConfig.MOVIES_API_KEY;
                 else
-                    base = "http://api.themoviedb.org/3/movie/top_rated?api_key=0a4e07e521aa70416fb2f0bd1985a5ac";
+                    base = "http://api.themoviedb.org/3/movie/top_rated?api_key="+BuildConfig.MOVIES_API_KEY;
 
                 Log.v(LOG_TAG, "URL: " + base);
                 URL url = new URL(base);
@@ -232,9 +234,26 @@ public class MainActivityFragment extends Fragment {
         if (isOnline()) {
             FetchMoviesTask fetcher = new FetchMoviesTask();
             fetcher.execute(sortMethod);
+            if(sortMethod.equals("0"))
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Most Popular Movies");
+            else
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Highest Rated Movies");
         } else {
             Log.e("onStart()", "No Network Connection");
             Toast.makeText(getActivity(), "No Network Connection - Can't fetch movie data", Toast.LENGTH_LONG).show();
         }
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.e("onConfigurationChanged", "configuration::orientation change");
+        // Checks the orientation of the screen
+        //if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        //    Toast.makeText(getActivity(),"landscape",Toast.LENGTH_SHORT).show();
+        //} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+        //    Toast.makeText(getActivity(), "portrait", Toast.LENGTH_SHORT).show();
+        //}
+    }
+
 }
